@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using NZWalks.API.Data;
 using NZWalks.API.Models.Domain;
 using NZWalks.API.Models.DTO;
+using NZWalks.API.Repository;
 
 namespace NZWalks.API.Controllers
 {
@@ -11,20 +12,23 @@ namespace NZWalks.API.Controllers
     [ApiController]
     public class RegionsController : ControllerBase
     {
-        private NZWalksDbContext nZWalksDbContext;
+        private readonly NZWalksDbContext nZWalksDbContext;
+        private readonly IRegionRepository regionRepository;
 
-        public RegionsController(NZWalksDbContext nZWalksDbContext)
+        public RegionsController(NZWalksDbContext nZWalksDbContext, IRegionRepository regionRepository)
         {
             this.nZWalksDbContext = nZWalksDbContext;
+            this.regionRepository = regionRepository;
         }
+
 
         //GET All regions 
         // GET: https://localhost:portnumber/api/regions
         [HttpGet]
-        public IActionResult GetAll()
+        public async  Task<IActionResult> GetAll()
         {
             //Getting data from database - DomainModel
-            var regionsDomain = nZWalksDbContext.Regions.ToList();
+            var regionsDomain = await regionRepository.GetAllAsync();
 
             //Mapping DomainModel to DtoModel
             var regionsDto = new List<RegionDto>();
@@ -42,13 +46,14 @@ namespace NZWalks.API.Controllers
             return Ok(regionsDto);
         }
 
+
         //GET Single Region by ID
         [HttpGet]
         [Route("{id:Guid}")] // :Guid is setting the type of id so that only guid type can be passed
-        public IActionResult GetById([FromRoute] Guid id) //id parameter name should be same as Route's {id}
+        public async Task<IActionResult> GetById([FromRoute] Guid id) //id parameter name should be same as Route's {id}
         {
             //Getting RegionDomain model from DB
-            var regionsDomain = nZWalksDbContext.Regions.Find(id); //Find() mtd only used for primary key
+            var regionsDomain = await regionRepository.GetByIdAsync(id); //Find() mtd only used for primary key
 
             //var region = nZWalksDbContext.Regions.FirstOrDefault(r => r.Id == id); //this method can be used for other columns also
             
@@ -70,10 +75,11 @@ namespace NZWalks.API.Controllers
             return Ok(regionDto);
         }
 
+
         //POST to create a new region
         //POST: https://localhost:portnumber/api/regions
         [HttpPost]
-        public IActionResult Create([FromBody] AddRegionRequestDto addRegionRequestDto)
+        public async Task<IActionResult> Create([FromBody] AddRegionRequestDto addRegionRequestDto)
         {
             //Mapping Dto to Region 
             var regionDomainModel = new Region()
@@ -83,9 +89,7 @@ namespace NZWalks.API.Controllers
                 RegionImageUrl = addRegionRequestDto.RegionImageUrl
             };
 
-            //storing Region in database
-            nZWalksDbContext.Regions.Add(regionDomainModel);
-            nZWalksDbContext.SaveChanges();
+            regionDomainModel = await regionRepository.CreateAsync(regionDomainModel);
 
             //Map just added model to dto to send it back to client
             var RegionDto = new RegionDto()
@@ -100,25 +104,25 @@ namespace NZWalks.API.Controllers
 
         }
 
+
         [HttpPut]
         [Route("{id:Guid}")]
-        public IActionResult Update([FromRoute] Guid id, [FromBody] UpdateRegionRequestDto updateRegionRequestDto)
+        public async Task<IActionResult> Update([FromRoute] Guid id, [FromBody] UpdateRegionRequestDto updateRegionRequestDto)
         {
-            //Checking if id exist in the database
-            var regionDomainModel = nZWalksDbContext.Regions.FirstOrDefault(r => r.Id == id);
+            var regionDomainModel = new Region()
+            {
+                Code = updateRegionRequestDto.Code,
+                Name = updateRegionRequestDto.Name,
+                RegionImageUrl = updateRegionRequestDto.RegionImageUrl
+            };
+
+           regionDomainModel = await regionRepository.UpdateAsync(id, regionDomainModel);
 
             if (regionDomainModel == null)
             {
                 return NotFound();
             }
 
-            //updating regionDomainModel
-            regionDomainModel.Code = updateRegionRequestDto.Code;
-            regionDomainModel.Name = updateRegionRequestDto.Name;
-            regionDomainModel.RegionImageUrl = updateRegionRequestDto.RegionImageUrl;
-
-            //we dont have to use the nZWalksDbContext.Update() method since regionDomainModel is alredy being tracked by the entitiy framework when we used FirstOrDefault() method to get it.
-            nZWalksDbContext.SaveChanges();
 
             //Mapping the updated regionDomainModel to a dto to send it back as response
 
@@ -132,22 +136,19 @@ namespace NZWalks.API.Controllers
             return Ok(regionDto);
         }
 
+
         //Delete region 
         //DELETE: https://localhost:portno/api/regions/{id}
         [HttpDelete]
         [Route("{id:Guid}")]
-        public IActionResult Delete([FromRoute] Guid id)
+        public async Task<IActionResult> Delete([FromRoute] Guid id)
         {
-            //Finding if id exists in the database
-            var regionDomainModel = nZWalksDbContext.Regions.FirstOrDefault(r => r.Id == id);
-            if (regionDomainModel == null)
+            var regionDomainModel = await regionRepository.DeleteAsync(id);
+            
+            if(regionDomainModel == null)
             {
                 return NotFound();
             }
-
-            //deleting from the database
-            nZWalksDbContext.Regions.Remove(regionDomainModel);
-            nZWalksDbContext.SaveChanges();
 
             //Mapping deleted RegionDomainModel to dto to send it back as response
             var regionDto = new RegionDto()
@@ -157,7 +158,8 @@ namespace NZWalks.API.Controllers
                 Name = regionDomainModel.Name,
                 RegionImageUrl = regionDomainModel.RegionImageUrl
             };
-            return Ok(regionDomainModel);
+
+            return Ok(regionDto);
         }
     }
 }
