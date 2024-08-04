@@ -26,18 +26,18 @@ namespace NZWalks.API.Data
             {
                 new Difficulty()
                 {
-                    Id = Guid.Parse("26cbb49b-ec90-4c2b-8bf6-e1dafa05120d"),
+                    Id = Guid.Parse("F808DDCD-B5E5-4D80-B732-1CA523E48434"),
+                    Name = "Hard"
+                },
+                new Difficulty()
+                {
+                    Id =  Guid.Parse("54466F17-02AF-48E7-8ED3-5A4A8BFACF6F"),
                     Name = "Easy"
                 },
                 new Difficulty()
                 {
-                    Id =  Guid.Parse("27468d81-cca2-4b61-9a1c-d9a56f118b86"),
+                    Id = Guid.Parse("EA294873-7A8C-4C0F-BFA7-A2EB492CBF8C"),
                     Name = "Medium"
-                },
-                new Difficulty()
-                {
-                    Id = Guid.Parse("cecc00d7-0961-47f3-9b46-0623dffc2e7c"),
-                    Name = "Hard"
                 }
             };
 
