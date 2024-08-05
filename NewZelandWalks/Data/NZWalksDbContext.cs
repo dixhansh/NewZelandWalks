@@ -4,8 +4,11 @@ using NZWalks.API.Models.Domain;
 namespace NZWalks.API.Data
 {
     public class NZWalksDbContext : DbContext
-    {
-        public NZWalksDbContext(DbContextOptions dbContextOptions) : base(dbContextOptions)
+    {                                           /* The generic type DbContextOptions<> is added to prevent the exception
+                                                 * (since we have more than one DbContext class which have DbcontextOptions
+                                                 * passed as paramerters in their constructor which will result in 
+                                                 * exception if it is of non generic type)*/  
+        public NZWalksDbContext(DbContextOptions<NZWalksDbContext> dbContextOptions) : base(dbContextOptions)
         {
                    
         }
