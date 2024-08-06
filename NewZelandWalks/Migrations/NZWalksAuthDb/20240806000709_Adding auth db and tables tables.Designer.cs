@@ -12,8 +12,8 @@ using NZWalks.API.Data;
 namespace NZWalks.API.Migrations.NZWalksAuthDb
 {
     [DbContext(typeof(NZWalksAuthDbContext))]
-    [Migration("20240805015052_Creating Auth Database2")]
-    partial class CreatingAuthDatabase2
+    [Migration("20240806000709_Adding auth db and tables tables")]
+    partial class Addingauthdbandtablestables
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

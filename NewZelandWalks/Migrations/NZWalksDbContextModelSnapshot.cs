@@ -39,19 +39,48 @@ namespace NZWalks.API.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("26cbb49b-ec90-4c2b-8bf6-e1dafa05120d"),
+                            Id = new Guid("f808ddcd-b5e5-4d80-b732-1ca523e48434"),
+                            Name = "Hard"
+                        },
+                        new
+                        {
+                            Id = new Guid("54466f17-02af-48e7-8ed3-5a4a8bfacf6f"),
                             Name = "Easy"
                         },
                         new
                         {
-                            Id = new Guid("27468d81-cca2-4b61-9a1c-d9a56f118b86"),
+                            Id = new Guid("ea294873-7a8c-4c0f-bfa7-a2eb492cbf8c"),
                             Name = "Medium"
-                        },
-                        new
-                        {
-                            Id = new Guid("cecc00d7-0961-47f3-9b46-0623dffc2e7c"),
-                            Name = "Hard"
                         });
+                });
+
+            modelBuilder.Entity("NZWalks.API.Models.Domain.Image", b =>
+                {
+                    b.Property<Guid>("id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("FileDescription")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("FileExtension")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("FileName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("FilePath")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<long>("FileSizeInBytes")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("id");
+
+                    b.ToTable("Images");
                 });
 
             modelBuilder.Entity("NZWalks.API.Models.Domain.Region", b =>

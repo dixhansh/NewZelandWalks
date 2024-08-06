@@ -79,6 +79,9 @@ namespace NZWalks.API.Controllers
                 return NotFound();
             }
 
+            //Mimicking an exception occured during the execution of the code
+            throw new Exception("A new exception occured in GetById() method");
+
             //Map DomainModel to Dto 
             return Ok(mapper.Map<WalkDto>(WalkDomainModel));
         }
